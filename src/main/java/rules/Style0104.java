@@ -66,7 +66,7 @@ public class Style0104 extends Rule {
 			if(!errorsList.isEmpty()) {
 				validation.setErrorList(errorsList);
 				validation.setStatus(true);
-				validation.setMessage("Validation completed");
+				validation.setMessage("does not comply with the rule "+this.name);
 			}
 
 		}catch(Exception e) {

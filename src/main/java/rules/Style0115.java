@@ -65,12 +65,12 @@ public class Style0115 extends Rule {
 			if(!errorsList.isEmpty()) {
 				validation.setErrorList(errorsList);
 				validation.setStatus(true);
-				validation.setMessage("Validation completed");
+				validation.setMessage("does not comply with the rule "+this.name);
 			}
 
 		}catch(Exception e) {
 			validation.setStatus(false);
-			validation.setMessage("threre are some errors validating xpdl file");
+			validation.setMessage("Found some errors validating xpdl file");
 		}
 		
 		

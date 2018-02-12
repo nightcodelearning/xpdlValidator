@@ -136,7 +136,7 @@ public class FileUploadController {
     	
     		for (Rule rule : rulesList) {
     			Validation val= rule.validation(convFile);
-    			if(!val.getErrorList().isEmpty()) {
+    			if(val.isStatus()) {
     				validationList.add(val);
     				}
 			}
