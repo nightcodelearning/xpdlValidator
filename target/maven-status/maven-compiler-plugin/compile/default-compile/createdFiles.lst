@@ -1,0 +1,17 @@
+xpdl\storage\StorageService.class
+rules\Style0104.class
+xpdl\FileUploadController.class
+xpdl\storage\StorageException.class
+rules\RuleFactory.class
+xpdl\storage\StorageFileNotFoundException.class
+rules\Style0122.class
+rules\Rule.class
+xpdl\storage\FileSystemStorageService.class
+rules\Style0123.class
+xpdl\storage\StorageProperties.class
+rules\RuleFactoryMethod.class
+xpdl\Application.class
+rules\Style0115.class
+rules\Bpmn0102.class
+rules\Validation.class
+rules\XpdlError.class
