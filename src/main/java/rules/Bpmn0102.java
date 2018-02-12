@@ -1,11 +1,14 @@
 package rules;
 
+import java.io.File;
+
 public class Bpmn0102 extends Rule {
 
 	@Override
-	public String validation() {
-		String validation=" validation Bpmn0102";
+	public Validation validation(File file) {
+		name=" validation Bpmn0102";
 		
+	
 		return validation;
 	}
 

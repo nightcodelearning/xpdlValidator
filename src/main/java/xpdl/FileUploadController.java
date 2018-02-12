@@ -1,5 +1,7 @@
 package xpdl;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -24,16 +26,21 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
 import rules.Rule;
 import rules.RuleFactory;
 import rules.RuleFactoryMethod;
-import rules.Style0115;
+import rules.Validation;
 import xpdl.storage.StorageFileNotFoundException;
 import xpdl.storage.StorageService;
 
 @Controller
 public class FileUploadController {
-
+	private List<Validation> validationList=new ArrayList<>();
     private final StorageService storageService;
 
     @Autowired
@@ -67,15 +74,24 @@ public class FileUploadController {
             RedirectAttributes redirectAttributes) {
     		try {
     			 storageService.store(file);
+    			 validationList=new ArrayList<>();
     		        validateFile(file);
     		        
-    		        redirectAttributes.addFlashAttribute("message",
-    		                "You successfully uploaded " + file.getOriginalFilename() + "!");
+					 
+    		        if(!validationList.isEmpty()) {
+	    		        	Gson gson = new GsonBuilder().setPrettyPrinting().create();
+	    		        	String json = gson.toJson(validationList);
+	    		        	redirectAttributes.addFlashAttribute("validationError",json);
+    		        	
+    		        }else {
+    		        	redirectAttributes.addFlashAttribute("validationError","Validation completed without errors");
+    		        	
+    		        }
     		        
-    		        redirectAttributes.addFlashAttribute("mensajeDario","hola mundo");
     		        return "redirect:/";
     			
     		}catch(Exception e) {
+    			e.printStackTrace();
     			redirectAttributes.addFlashAttribute("mensajeError","No se pudo realizar la validación");
 		        return "redirect:/";
     		}
@@ -91,7 +107,7 @@ public class FileUploadController {
      * 
      * @param file
      */
-    public static void validateFile(MultipartFile file) throws Exception{
+    public void validateFile(MultipartFile file) throws Exception{
     	
     		//read rules
     		Properties properties = new Properties();
@@ -103,52 +119,42 @@ public class FileUploadController {
     		List<Rule> rulesList=new ArrayList<>();
     		RuleFactoryMethod factory=new RuleFactory();
     		
+    		File convFile = new File(file.getOriginalFilename());
+    	    convFile.createNewFile(); 
+    	    FileOutputStream fos = new FileOutputStream(convFile); 
+    	    fos.write(file.getBytes());
+    	    fos.close(); 
+    		
+    		
     		//load rules, call factory 
     		while (keys.hasMoreElements()){
      		   Object key = keys.nextElement();
-     		   //System.out.println(properties.get(key).toString());
      		  Rule rule=factory.createRule(properties.get(key).toString());
      		  rulesList.add(rule);
      		}
-    		
+
+    	
     		for (Rule rule : rulesList) {
-				System.out.println(rule.validation());
+    			Validation val= rule.validation(convFile);
+    			if(!val.getErrorList().isEmpty()) {
+    				validationList.add(val);
+    				}
 			}
-//    		File convFile = new File(file.getOriginalFilename());
-//    	    convFile.createNewFile(); 
-//    	    FileOutputStream fos = new FileOutputStream(convFile); 
-//    	    fos.write(file.getBytes());
-//    	    fos.close(); 
-//    	    
-//    	 // La expresion xpath de busqueda
-//    		String xPathExpression = "//satelite[@nombre='Luna']";
-//    		
-//                    // Carga del documento xml
-//     		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-//     		DocumentBuilder builder = factory.newDocumentBuilder();
-//     		Document documento = builder.parse(convFile);
-//
-//    		// Preparación de xpath
-//     		XPath xpath = XPathFactory.newInstance().newXPath();
-//
-//     		// Consultas
-//     		NodeList nodos = (NodeList) xpath.evaluate(xPathExpression, documento, XPathConstants.NODESET);
-//
-//    		for (int i=0;i<nodos.getLength();i++){
-//    			System.out.println(nodos.item(i).getNodeName()+" : " +
-//                               nodos.item(i).getAttributes().getNamedItem("nombre"));
-//    		}
-//    		
-//		String content = new String(file.getBytes(), "UTF-8");
-//		System.out.println(content);
+    			
+    		
+
     	
-//    	DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-//    	DocumentBuilder builder = factory.newDocumentBuilder(); 
-//    	Document doc = builder.parse(file);
-//    	XPathFactory xPathfactory = XPathFactory.newInstance();
-//    	XPath xpath = xPathfactory.newXPath(); 
-//    	XPathExpression expr = xpath.compile(<xpath_expression>);
-    	
+    }
+    
+    public static String toPrettyFormat(String jsonString) 
+    {
+        JsonParser parser = new JsonParser();
+        JsonObject json = parser.parse(jsonString).getAsJsonObject();
+
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        String prettyJson = gson.toJson(json);
+
+        return prettyJson;
     }
 
 }
