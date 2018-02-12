@@ -19,6 +19,13 @@ Xpdl Validation, using spring boot upload file template.
 
 ## How to run
 
+	##using STS IDE
+1) checkout repository.
+2) import project 
+3) run as Spring Boot App.
+
+	##Using generated .Jar file. 
+	
 1) checkout repository.
 
 2) open command line prompt
